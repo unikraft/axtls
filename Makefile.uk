@@ -1,0 +1,105 @@
+#  libaxtls Makefile.uk
+#
+#  Authors: Felipe Huici <felipe.huici@neclab.eu>
+#
+#  Copyright (c) 2019, NEC Europe Ltd., NEC Corporation. All rights reserved.
+#
+#  Redistribution and use in source and binary forms, with or without
+#  modification, are permitted provided that the following conditions
+#  are met:
+#
+#  1. Redistributions of source code must retain the above copyright
+#     notice, this list of conditions and the following disclaimer.
+#  2. Redistributions in binary form must reproduce the above copyright
+#     notice, this list of conditions and the following disclaimer in the
+#     documentation and/or other materials provided with the distribution.
+#  3. Neither the name of the copyright holder nor the names of its
+#     contributors may be used to endorse or promote products derived from
+#     this software without specific prior written permission.
+#
+#  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+#  AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+#  IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+#  ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+#  LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+#  CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+#  SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+#  INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+#  CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+#  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+#  POSSIBILITY OF SUCH DAMAGE.
+#
+#  THIS HEADER MAY NOT BE EXTRACTED OR MODIFIED IN ANY WAY.
+#
+
+################################################################################
+# Library registration
+################################################################################
+$(eval $(call addlib_s,libaxtls,$(CONFIG_LIBAXTLS)))
+
+################################################################################
+# Sources
+################################################################################
+LIBAXTLS_VERSION=2.1.5
+LIBAXTLS_URL=https://sourceforge.net/projects/axtls/files/$(LIBAXTLS_VERSION)/axTLS-$(LIBAXTLS_VERSION).tar.gz/download
+LIBAXTLS_PATCHDIR=$(LIBAXTLS_BASE)/patches
+$(eval $(call fetchas,libaxtls,$(LIBAXTLS_URL),$(LIBAXTLS_VERSION).tgz))
+$(eval $(call patch,libaxtls,$(LIBAXTLS_PATCHDIR),libaxtls-$(LIBAXTLS_VERSION)))
+
+################################################################################
+# Helpers
+################################################################################
+LIBAXTLS_SRC=$(LIBAXTLS_ORIGIN)/axtls-code
+
+################################################################################
+# Library includes
+################################################################################
+CINCLUDES-$(CONFIG_LIBAXTLS) +=   -I$(LIBAXTLS_SRC)/include \
+                                  -I$(LIBAXTLS_SRC)/crypto  \
+                                  -I$(LIBAXTLS_SRC)/ssl     \
+                                  -I$(LIBAXTLS_BASE)/include
+
+CXXINCLUDES-$(CONFIG_LIBAXTLS) += -I$(LIBAXTLS_SRC)/include \
+                                  -I$(LIBAXTLS_SRC)/crypto  \
+                                  -I$(LIBAXTLS_SRC)/ssl     \
+                                  -I$(LIBAXTLS_BASE)/include
+
+################################################################################
+# Global flags
+################################################################################
+LIBAXTLS_CFLAGS-y += -DHAVE_CONFIG_H
+
+# Suppress some warnings to make the build process look neater
+SUPPRESS_FLAGS += -Wno-sign-compare -Wno-parentheses -Wno-unused-parameter
+
+LIBAXTLS_CFLAGS-y   += $(SUPPRESS_FLAGS)
+LIBAXTLS_CXXFLAGS-y += $(SUPPRESS_FLAGS)
+
+################################################################################
+# axtls code - crypto
+################################################################################
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/aes.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/bigint.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/crypto_misc.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/hmac.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/md5.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/rc4.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/rsa.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/sha1.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/sha256.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/sha384.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/crypto/sha512.c
+
+################################################################################
+# axtls code - ssl
+################################################################################
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/asn1.c
+#LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/gen_cert.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/loader.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/openssl.c
+#LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/os_port.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/p12.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/tls1.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/tls1_svr.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/tls1_clnt.c
+LIBAXTLS_SRCS-y += $(LIBAXTLS_SRC)/ssl/x509.c
