@@ -1,0 +1,5 @@
+config LIBAXTLS
+	   bool "axTLS - Embedded SSL"
+	   default n
+	   select LIBNEWLIBC
+	   select LIBLWIP
